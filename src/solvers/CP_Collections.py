@@ -24,6 +24,27 @@ class CostVarCollection(list):
         return sum(self.weight * solver.Value(var) for var in self)
 
 
+class WeightedCostVarCollection(list):
+    """
+    Collection for cost variables with individual integer weights per variable.
+
+    This is useful when the cost coefficient depends on metadata (e.g., "near-future"
+    rescheduling penalties where each operation gets a different deviation weight).
+    """
+
+    def __init__(self):
+        super().__init__()
+
+    def add(self, var: cp_model.IntVar, weight: int = 1):
+        self.append((int(weight), var))
+
+    def objective_expr(self):
+        return sum(w * var for w, var in self)
+
+    def total_cost(self, solver):
+        return sum(w * solver.Value(var) for w, var in self)
+
+
 
 class OperationIndexMapper(UserDict[Tuple[int, int], JobOperation]):
     def add(self, job_idx: int, op_idx: int, operation: JobOperation):

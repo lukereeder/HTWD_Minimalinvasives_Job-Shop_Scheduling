@@ -166,4 +166,27 @@ desktop.ini
 
 *.csv
 *.log
-# *.db
+*.db
+
+# Interne Dokumente (Entwuerfe, KI-Notizen, Vortraege)
+ABSCHLUSSBERICHT*.md
+ABSCHLUSSB*ERICHT*.md
+ABSCHLUSSBERICHT_NEU.md
+CHAT_ZUSAMMENFASSUNG.md
+EMAIL_AN_PROFESSOR.md
+FINALE_ERGEBNISSE.md
+STATUS.md
+TWDEV_INTEGRATION.md
+VORTRAG*.md
+vortrag/
+abschlussbericht/
+
+# Word-Dokumente und Generator
+*.docx
+generate_chapter9_docx.py
+
+# Prof-Unterlagen
+*.pdf
+
+# Cursor
+.cursor/

@@ -459,6 +459,47 @@ class ExperimentAnalysisQuery:
             session.expunge_all()
             return jobs
 
+    @staticmethod
+    def get_simulation_jobs(
+        experiment_id: Optional[int] = None,
+        max_bottleneck_utilization: Optional[float] = None,
+        db_path: Optional[str] = None
+    ) -> List[SimulationJob]:
+        """
+        Liefert alle SimulationJobs (inkl. Operations, Job->Routing, Experiment).
+        - experiment_id=None → alle Experimente
+        - max_bottleneck_utilization: optionaler Filter auf Experiment.max_bottleneck_utilization (exakte Übereinstimmung)
+        """
+        if db_path:
+            my_engine = create_engine(f"sqlite:///{db_path}")
+            SessionFactory = sessionmaker(bind=my_engine)
+        else:
+            SessionFactory = SessionLocal
+
+        with SessionFactory() as session:
+            query = (
+                session.query(SimulationJob)
+                .options(
+                    joinedload(getattr(SimulationJob, "operations")),
+                    joinedload(getattr(SimulationJob, "job"))
+                    .joinedload(getattr(Job, "routing"))
+                    .joinedload(getattr(Routing, "operations")),
+                    joinedload(getattr(SimulationJob, "experiment")),
+                )
+            )
+
+            if experiment_id is not None:
+                query = query.filter(SimulationJob.experiment_id == experiment_id)
+
+            if max_bottleneck_utilization is not None:
+                query = query.join(Experiment, SimulationJob.experiment_id == Experiment.id).filter(
+                    Experiment.max_bottleneck_utilization == max_bottleneck_utilization
+                )
+
+            jobs = query.order_by(SimulationJob.experiment_id, SimulationJob.id).all()
+            session.expunge_all()
+            return jobs
+
     @classmethod
     def get_experiments_dataframe(
             cls,
@@ -581,5 +622,70 @@ class ExperimentAnalysisQuery:
         df = (
             pd.DataFrame.from_records(records, columns=ordered_cols)
             .sort_values([shift_column, job_column, position_column], ignore_index=True)
+        )
+        return df
+
+    @classmethod
+    def get_simulation_jobs_operations_dataframe(
+        cls,
+        experiment_id: Optional[int] = None,
+        max_bottleneck_utilization: Optional[float] = None,
+        job_column: str = "Job",
+        routing_column: str = "Routing_ID",
+        experiment_column: str = "Experiment_ID",
+        position_column: str = "Operation",
+        machine_column: str = "Machine",
+        og_duration_column: str = "Original Duration",
+        sim_duration_column: str = "Sim Duration",
+        start_column: str = "Start",
+        end_column: str = "End",
+        arrival_column: str = "Arrival",
+        earliest_start_column: str = "Ready Time",
+        due_date_column: str = "Due Date",
+        db_path: Optional[str] = None,
+    ) -> pd.DataFrame:
+        """
+        Baut ein DataFrame aus SimulationJobs (vollständige Simulation).
+        experiment_id=None → keine Filterung, es werden alle zurückgegeben.
+        """
+        jobs = cls.get_simulation_jobs(experiment_id, max_bottleneck_utilization, db_path=db_path)
+
+        records: list[dict] = []
+        for sj in jobs:
+            for op in sj.operations:
+                route_op = sj.job.routing.get_operation_by_position(op.position_number)
+                records.append({
+                    job_column: sj.id,
+                    routing_column: sj.job.routing_id,
+                    experiment_column: sj.experiment_id,
+                    position_column: op.position_number,
+                    machine_column: route_op.machine_name,
+                    arrival_column: sj.job.arrival,
+                    earliest_start_column: sj.job.earliest_start,
+                    due_date_column: sj.job.due_date,
+                    og_duration_column: route_op.duration,
+                    sim_duration_column: op.duration,
+                    start_column: op.start,
+                    end_column: op.end,
+                })
+
+        ordered_cols = [
+            job_column,
+            routing_column,
+            experiment_column,
+            arrival_column,
+            earliest_start_column,
+            due_date_column,
+            position_column,
+            machine_column,
+            og_duration_column,
+            sim_duration_column,
+            start_column,
+            end_column,
+        ]
+
+        df = (
+            pd.DataFrame.from_records(records, columns=ordered_cols)
+            .sort_values([experiment_column, job_column, position_column], ignore_index=True)
         )
         return df

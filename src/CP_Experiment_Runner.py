@@ -11,11 +11,18 @@ from src.simulation.LognormalFactorGenerator import LognormalFactorGenerator
 from src.simulation.ProductionSimulation import ProductionSimulation
 from src.solvers.CP_Solver import Solver
 
-email_notifier = EmailNotifier()
+# email_notifier = EmailNotifier()  # Deaktiviert für lokale Läufe
+email_notifier = None
 
 def run_experiment(
         experiment_id: int,  shift_length: int, total_shift_number: int, logger: Logger,
-        time_limit: Optional[int] = 60*20, bound_warmup_time: int = 30, bound_no_improvement_time: Optional[int] = 60):
+        time_limit: Optional[int] = 60*20, bound_warmup_time: int = 30, bound_no_improvement_time: Optional[int] = 60,
+        use_time_weighted_deviation: bool = False,
+        deviation_window_minutes: int = 8 * 60,
+        deviation_bucket_minutes: int = 60,
+        deviation_max_factor: Optional[int] = None,
+        machine_blockades: Optional[list[dict]] = None,
+):
     experiment = ExperimentQuery.get_experiment(experiment_id)
 
     source_name = experiment.routing_source.name
@@ -66,6 +73,8 @@ def run_experiment(
 
     waiting_job_ops_collection = LiveJobCollection()
 
+    shift_summaries: list[dict] = []
+
     # Shifts ----------------------------------------------------------------------------------------
     for shift_number in range(1, total_shift_number + 1):
         shift_start = shift_number * shift_length
@@ -75,18 +84,38 @@ def run_experiment(
         new_jobs_collection = jobs_collection.get_subset_by_earliest_start(earliest_start=shift_start)
         current_jobs_collection = new_jobs_collection + waiting_job_ops_collection
 
+        # Determine active blockades for this shift
+        active_blockades = []
+        if machine_blockades:
+            for blockade in machine_blockades:
+                # Blockade is active if it overlaps with current shift
+                if blockade['start'] < shift_end and blockade['end'] > shift_start:
+                    active_blockades.append(blockade)
+                    logger.info(f"Active blockade in shift {shift_number}: {blockade['machine']} from {blockade['start']} to {blockade['end']}")
+
         # Scheduling --------------------------------------------------------------
         solver = Solver(
             jobs_collection=current_jobs_collection,
             logger = logger,
-            schedule_start=shift_start
+            schedule_start=shift_start,
+            machine_blockades=active_blockades
         )
 
-        solver.build_model__absolute_lateness__start_deviation__minimization(
-            previous_schedule_jobs_collection=schedule_jobs_collection,
-            active_jobs_collection=active_job_ops_collection,
-            w_t=w_t, w_e=w_e, w_dev=w_dev
-        )
+        if use_time_weighted_deviation:
+            solver.build_model__absolute_lateness__time_weighted_start_deviation__minimization(
+                previous_schedule_jobs_collection=schedule_jobs_collection,
+                active_jobs_collection=active_job_ops_collection,
+                w_t=w_t, w_e=w_e, w_dev=w_dev,
+                deviation_window_minutes=deviation_window_minutes,
+                deviation_bucket_minutes=deviation_bucket_minutes,
+                deviation_max_factor=deviation_max_factor,
+            )
+        else:
+            solver.build_model__absolute_lateness__start_deviation__minimization(
+                previous_schedule_jobs_collection=schedule_jobs_collection,
+                active_jobs_collection=active_job_ops_collection,
+                w_t=w_t, w_e=w_e, w_dev=w_dev
+            )
 
         solver.log_model_info()
 
@@ -106,6 +135,7 @@ def run_experiment(
         )
 
         solver.log_solver_info()
+        shift_summaries.append({"shift": shift_number, **solver.get_solver_info()})
         schedule_jobs_collection = solver.get_schedule()
 
         ExperimentQuery.save_schedule_jobs(
@@ -137,9 +167,18 @@ def run_experiment(
     )
     logger.info(f"Experiment {experiment_id} finished")
     notify(experiment, logger, last_lines= 2)
+    return {
+        "experiment_id": experiment_id,
+        "use_time_weighted_deviation": use_time_weighted_deviation,
+        "machine_blockades": machine_blockades,
+        "shift_summaries": shift_summaries,
+    }
 
 
 def notify(experiment:Experiment, logger: Logger, shift_number: Optional[int] = None, last_lines: int = 10):
+    if email_notifier is None:
+        return  # Email-Benachrichtigung deaktiviert
+    
     experiment_info = f"Experiment {experiment.id} "
     if shift_number:
         experiment_info += (f"Shift {shift_number} - "

@@ -11,12 +11,12 @@ from src.domain.Collection import LiveJobCollection
 from src.domain.orm_models import JobOperation
 from src.solvers.CP_BoundStagnationGuard import BoundGuard
 from src.solvers.CP_Collections import MachineFixIntervalMap, OperationIndexMapper, JobDelayMap, MachineFixInterval, \
-    StartTimes, EndTimes, Intervals, OriginalOperationStarts, CostVarCollection
+    StartTimes, EndTimes, Intervals, OriginalOperationStarts, CostVarCollection, WeightedCostVarCollection
 
 
 class Solver:
 
-    def __init__(self, jobs_collection: LiveJobCollection, logger: Logger, schedule_start: int = 0):
+    def __init__(self, jobs_collection: LiveJobCollection, logger: Logger, schedule_start: int = 0, machine_blockades: Optional[List[Dict]] = None):
 
         self.logger = logger
 
@@ -27,6 +27,7 @@ class Solver:
 
         self.machines = jobs_collection.get_unique_machine_names()
         self.schedule_start = schedule_start
+        self.machine_blockades = machine_blockades or []
 
         # Model and solver
         self.model = cp_model.CpModel()
@@ -39,6 +40,7 @@ class Solver:
         self.tardiness_terms = CostVarCollection()
         self.earliness_terms = CostVarCollection()
         self.deviation_terms = CostVarCollection()
+        self.time_weighted_deviation_terms = WeightedCostVarCollection()
 
         #  Variable collections
         self.index_mapper = OperationIndexMapper()
@@ -60,6 +62,11 @@ class Solver:
             known_highest_value = jobs_collection.get_latest_due_date()
         else:
             known_highest_value = jobs_collection.get_latest_earliest_start()
+        
+        # Fallback: Falls known_highest_value None ist, nutze schedule_start
+        if known_highest_value is None:
+            known_highest_value = schedule_start
+        
         self.horizon = known_highest_value + total_duration
 
         # Create Variables -----------------------------------------------------------------------------
@@ -75,6 +82,10 @@ class Solver:
                 interval = self.model.NewIntervalVar(start, operation.duration, end, f"interval_{suffix}")
                 # interval = model.NewIntervalVar(start, operation.duration, start + operation.duration, f"interval_{suffix}")
 
+                # Store variables for later constraint/objective building
+                self.start_times.add(job_idx, op_idx, start)
+                self.end_times.add(job_idx, op_idx, end)
+                self.intervals.add(job_idx, op_idx, interval, operation.machine_name)
 
                 self.index_mapper.add(job_idx, op_idx, operation)
 
@@ -175,6 +186,7 @@ class Solver:
         - self.machines
         - self.intervals
         - self.machines_fix_intervals (from active_jobs_collection) - optional
+        - self.machine_blockades (deterministic machine failures) - optional
         """
 
         # Machine-level constraints (no overlap + fixed blocks from running ops) -----------------------
@@ -194,6 +206,21 @@ class Solver:
                 if start < end:
                     fixed_interval = self.model.NewIntervalVar(start, end - start, end, f"fixed_{machine}")
                     machine_intervals.append(fixed_interval)
+
+            # Machine blockades (deterministic failures)
+            for blockade_idx, blockade in enumerate(self.machine_blockades):
+                if blockade['machine'] == machine:
+                    block_start = blockade['start']
+                    block_end = blockade['end']
+                    if block_start < block_end:
+                        blocked_interval = self.model.NewIntervalVar(
+                            block_start, 
+                            block_end - block_start, 
+                            block_end, 
+                            f"blockade_{machine}_{blockade_idx}"
+                        )
+                        machine_intervals.append(blocked_interval)
+                        self.logger.info(f"Machine blockade: {machine} blocked from {block_start} to {block_end}")
 
             # NoOverlap für diese Maschine
             self.model.AddNoOverlap(machine_intervals)
@@ -225,6 +252,74 @@ class Solver:
             original_start = self.original_operation_starts[(job_idx, op_idx)]
             self.model.AddAbsEquality(deviation, start_var - original_start)
             self.deviation_terms.add(deviation)
+
+    @staticmethod
+    def _near_future_weight(
+        *,
+        original_start: int,
+        schedule_start: int,
+        window_minutes: int,
+        bucket_minutes: int,
+        max_factor: Optional[int] = None,
+    ) -> int:
+        """
+        Integer weight factor for deviation penalties:
+        - The closer `original_start` is to the current `schedule_start`, the larger the factor.
+        - Beyond `window_minutes` in the future => factor = 1.
+        """
+        if bucket_minutes <= 0:
+            raise ValueError("bucket_minutes must be > 0")
+        if window_minutes <= 0:
+            return 1
+
+        dt = max(0, int(original_start) - int(schedule_start))  # minutes into the future
+        dt = min(dt, int(window_minutes))
+
+        # Example: window=480, bucket=60 -> factors 9..1 (near future -> 9)
+        steps = max(1, (int(window_minutes) + int(bucket_minutes) - 1) // int(bucket_minutes))
+        bucket_idx = min(steps - 1, dt // int(bucket_minutes))  # 0..steps-1
+        factor = 1 + (steps - 1 - bucket_idx)
+
+        if max_factor is not None:
+            factor = min(int(max_factor), factor)
+        return int(factor)
+
+    def _add_time_weighted_start_deviation_var(
+        self,
+        job_idx: int,
+        op_idx: int,
+        *,
+        base_weight: int,
+        window_minutes: int,
+        bucket_minutes: int,
+        max_factor: Optional[int] = None,
+    ) -> None:
+        """
+        Add a deviation variable |start - original_start| with a per-operation weight that
+        depends on how close the operation originally was to the current shift start.
+        """
+        if base_weight <= 0:
+            return
+
+        start_var = self.start_times[(job_idx, op_idx)]
+        if (job_idx, op_idx) not in self.original_operation_starts:
+            return
+
+        original_start = int(self.original_operation_starts[(job_idx, op_idx)])
+        deviation = self.model.NewIntVar(0, self.horizon, f"tw_deviation_{job_idx}_{op_idx}")
+        self.model.AddAbsEquality(deviation, start_var - original_start)
+
+        factor = self._near_future_weight(
+            original_start=original_start,
+            schedule_start=int(self.schedule_start),
+            window_minutes=int(window_minutes),
+            bucket_minutes=int(bucket_minutes),
+            max_factor=max_factor,
+        )
+        coeff = int(base_weight) * int(factor)
+        if coeff <= 0:
+            return
+        self.time_weighted_deviation_terms.add(deviation, weight=coeff)
 
 
     # Main model builder -----------------------------------------------------------------------------------------------
@@ -280,6 +375,77 @@ class Solver:
             + self.deviation_terms.objective_expr()
         )
         self.model_completed = True
+
+    def build_model__absolute_lateness__time_weighted_start_deviation__minimization(
+        self,
+        previous_schedule_jobs_collection: Optional[LiveJobCollection] = None,
+        active_jobs_collection: Optional[LiveJobCollection] = None,
+        *,
+        w_t: int = 1,
+        w_e: int = 1,
+        w_dev: int = 1,
+        deviation_window_minutes: int = 8 * 60,
+        deviation_bucket_minutes: int = 60,
+        deviation_max_factor: Optional[int] = None,
+    ) -> bool:
+        """
+        Absolute lateness model (tardiness + earliness) plus a time-weighted start deviation:
+        if an operation is close to the current shift start, rescheduling it is more expensive.
+        """
+        if self.model_completed:
+            self.logger.warning("Model already completed!")
+            return False
+
+        self.logger.info("Building model for absolute lateness + TIME-WEIGHTED start deviation minimization")
+        self.previous_schedule_jobs_collection = previous_schedule_jobs_collection
+        self.active_jobs_collection = active_jobs_collection
+
+        # I. Extractions from previous schedule and simulation!
+        self._extract_previous_starts_for_deviation()
+        self._extract_delays_from_active_operations()
+
+        # II. Constraints (after I.)
+        self._add_machine_no_overlap_constraints()
+        self._add_technological_operation_constraints_with_transition_times()
+
+        # III. Operation-level variables (after I.)
+        for (job_idx, op_idx), operation in self.index_mapper.items():
+            # Lateness terms for the job (last operation)
+            if operation.position_number == operation.job.last_operation_position_number:
+                self._add_tardiness_var(job_idx, op_idx, operation)
+                self._add_earliness_var(job_idx, op_idx, operation)
+
+            # Time-weighted deviation from original schedule
+            self._add_time_weighted_start_deviation_var(
+                job_idx,
+                op_idx,
+                base_weight=int(w_dev),
+                window_minutes=int(deviation_window_minutes),
+                bucket_minutes=int(deviation_bucket_minutes),
+                max_factor=deviation_max_factor,
+            )
+
+        # If no previous schedule exists, deviation must be zero (same behavior as legacy model)
+        if previous_schedule_jobs_collection is None or previous_schedule_jobs_collection.count_operations() == 0:
+            self.time_weighted_deviation_terms = WeightedCostVarCollection()
+
+        self.logger.info(
+            "Model weights: "
+            + f"{w_t = }, {w_e = }, "
+            + f"{w_dev = } (time-weighted, window={deviation_window_minutes}min, bucket={deviation_bucket_minutes}min)"
+        )
+
+        self.tardiness_terms.set_weight(weight=w_t)
+        self.earliness_terms.set_weight(weight=w_e)
+
+        # Objective
+        self.model.Minimize(
+            self.tardiness_terms.objective_expr()
+            + self.earliness_terms.objective_expr()
+            + self.time_weighted_deviation_terms.objective_expr()
+        )
+        self.model_completed = True
+        return True
 
     def build_model__absolute_lateness__with_fix_order_on_machines(
             self,
@@ -755,6 +921,7 @@ class Solver:
                 solver_info["tardiness_cost"] = self.tardiness_terms.total_cost(self.solver)
                 solver_info["earliness_cost"] = self.earliness_terms.total_cost(self.solver)
                 solver_info["deviation_cost"] = self.deviation_terms.total_cost(self.solver)
+                solver_info["time_weighted_deviation_cost"] = self.time_weighted_deviation_terms.total_cost(self.solver)
 
             return solver_info
         return {"access_fault": "Solver status is not available!"}

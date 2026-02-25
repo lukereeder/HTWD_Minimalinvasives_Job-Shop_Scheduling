@@ -4,6 +4,8 @@ Dataframe Analyses.py contains
 - DataFrameMetricsAnalyser
 - DataFramePlotGenerator
 """
+from __future__ import annotations
+
 import math
 from datetime import timedelta
 

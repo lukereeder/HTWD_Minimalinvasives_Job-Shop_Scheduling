@@ -57,6 +57,38 @@ def main() -> None:
         required=True,
         help='Simulation noise sigma. Must be one of "simulation_sigma" from the config file.',
     )
+    # Time-Weighted Deviation Parameter
+    parser.add_argument(
+        "--use_time_weighted_deviation",
+        action="store_true",
+        help="Enable time-weighted deviation (twdev) instead of standard deviation.",
+    )
+    parser.add_argument(
+        "--deviation_window_minutes",
+        type=int,
+        default=8 * 60,
+        help="Time window in minutes for twdev scaling (default: 480).",
+    )
+    parser.add_argument(
+        "--deviation_bucket_minutes",
+        type=int,
+        default=60,
+        help="Bucket size in minutes for twdev scaling (default: 60).",
+    )
+    parser.add_argument(
+        "--deviation_max_factor",
+        type=int,
+        default=None,
+        help="Maximum scaling factor for twdev (default: None = no limit).",
+    )
+    # Machine Blockade Parameter
+    parser.add_argument(
+        "--machine_blockade",
+        type=str,
+        default=None,
+        help="Machine blockade in format 'machine:start:end' (e.g. 'M00:1500:1560'). Can be specified multiple times.",
+        action="append",
+    )
 
     args = parser.parse_args()
 
@@ -98,6 +130,22 @@ def main() -> None:
         )
     sigma = float(args.sigma)
 
+    # Parse machine blockades
+    machine_blockades = None
+    if args.machine_blockade:
+        machine_blockades = []
+        for blockade_str in args.machine_blockade:
+            parts = blockade_str.split(':')
+            if len(parts) != 3:
+                raise SystemExit(
+                    f"Error: --machine_blockade must be in format 'machine:start:end', got: {blockade_str}"
+                )
+            machine_blockades.append({
+                'machine': parts[0],
+                'start': int(parts[1]),
+                'end': int(parts[2])
+            })
+
     # Generate combinations (ohne sigma) und run
     for (util, a_lat, i_tar) in product(
         selected_utils,
@@ -113,6 +161,10 @@ def main() -> None:
             experiment_type="CP",
         )
         logger_name = f"experiments_{util:.2f}_sig{sigma:g}"
+        if args.use_time_weighted_deviation:
+            logger_name += "_twdev"
+        if machine_blockades:
+            logger_name += "_blockade"
         logger = Logger(name=logger_name, log_file=f"{logger_name}.log")
         run_experiment(
             experiment_id=experiment_id,
@@ -122,13 +174,27 @@ def main() -> None:
             time_limit=args.time_limit,
             bound_no_improvement_time=args.bound_no_improvement_time,
             bound_warmup_time=args.bound_warmup_time,
+            use_time_weighted_deviation=args.use_time_weighted_deviation,
+            deviation_window_minutes=args.deviation_window_minutes,
+            deviation_bucket_minutes=args.deviation_bucket_minutes,
+            deviation_max_factor=args.deviation_max_factor,
+            machine_blockades=machine_blockades,
         )
 
 
 if __name__ == "__main__":
     """
     Example usage:
+    # Standard deviation:
     python run_cp_experiments.py --util 0.75 --sigma 0.1 --time_limit 1800 --bound_no_improvement_time 600 --bound_warmup_time 60
     python run_cp_experiments.py --util all --time_limit 900 --bound_no_improvement_time 300 --bound_warmup_time 30 --sigma 0.05
+    
+    # Time-weighted deviation (twdev):
+    python run_cp_experiments.py --util 0.75 --sigma 0.1 --time_limit 1800 --bound_no_improvement_time 600 --bound_warmup_time 60 --use_time_weighted_deviation --deviation_window_minutes 480 --deviation_bucket_minutes 60
+    python run_cp_experiments.py --util all --sigma 0.05 --time_limit 900 --bound_no_improvement_time 300 --bound_warmup_time 30 --use_time_weighted_deviation --deviation_max_factor 8
+    
+    # With machine blockade:
+    python run_cp_experiments.py --util 0.75 --sigma 0.1 --time_limit 1800 --bound_no_improvement_time 600 --bound_warmup_time 60 --machine_blockade M00:1500:1560
+    python run_cp_experiments.py --util 0.75 --sigma 0.1 --time_limit 1800 --bound_no_improvement_time 600 --bound_warmup_time 60 --use_time_weighted_deviation --machine_blockade M00:1500:1560 --machine_blockade M03:2000:2100
     """
     main()

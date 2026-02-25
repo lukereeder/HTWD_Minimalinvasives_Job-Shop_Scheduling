@@ -13,7 +13,12 @@ from src.solvers.CP_Solver import Solver
 
 def run_experiment(
         experiment_id: int,  shift_length: int, total_shift_number: int, logger: Logger,
-        time_limit: Optional[int] = 60*20, bound_warmup_time: int = 30, bound_no_improvement_time: Optional[int] = 60):
+        time_limit: Optional[int] = 60*20, bound_warmup_time: int = 30, bound_no_improvement_time: Optional[int] = 60,
+        use_time_weighted_deviation: bool = False,
+        deviation_window_minutes: int = 8 * 60,
+        deviation_bucket_minutes: int = 60,
+        deviation_max_factor: Optional[int] = None,
+):
     experiment = ExperimentQuery.get_experiment(experiment_id)
 
     source_name = experiment.routing_source.name
@@ -64,6 +69,8 @@ def run_experiment(
 
     waiting_job_ops_collection = LiveJobCollection()
 
+    shift_summaries: list[dict] = []
+
     # Shifts ----------------------------------------------------------------------------------------
     for shift_number in range(1, total_shift_number + 1):
         shift_start = shift_number * shift_length
@@ -80,11 +87,21 @@ def run_experiment(
             schedule_start=shift_start
         )
 
-        solver.build_model__absolute_lateness__start_deviation__minimization(
-            previous_schedule_jobs_collection=schedule_jobs_collection,
-            active_jobs_collection=active_job_ops_collection,
-            w_t=w_t, w_e=w_e, w_dev=w_dev
-        )
+        if use_time_weighted_deviation:
+            solver.build_model__absolute_lateness__time_weighted_start_deviation__minimization(
+                previous_schedule_jobs_collection=schedule_jobs_collection,
+                active_jobs_collection=active_job_ops_collection,
+                w_t=w_t, w_e=w_e, w_dev=w_dev,
+                deviation_window_minutes=deviation_window_minutes,
+                deviation_bucket_minutes=deviation_bucket_minutes,
+                deviation_max_factor=deviation_max_factor,
+            )
+        else:
+            solver.build_model__absolute_lateness__start_deviation__minimization(
+                previous_schedule_jobs_collection=schedule_jobs_collection,
+                active_jobs_collection=active_job_ops_collection,
+                w_t=w_t, w_e=w_e, w_dev=w_dev
+            )
 
         solver.log_model_info()
 
@@ -104,6 +121,7 @@ def run_experiment(
         )
 
         solver.log_solver_info()
+        shift_summaries.append({"shift": shift_number, **solver.get_solver_info()})
         schedule_jobs_collection = solver.get_schedule()
 
         ExperimentQuery.save_schedule_jobs(
@@ -129,6 +147,11 @@ def run_experiment(
         live_jobs=entire_simulation_jobs.values(),
     )
     logger.info(f"Experiment {experiment_id} finished")
+    return {
+        "experiment_id": experiment_id,
+        "use_time_weighted_deviation": use_time_weighted_deviation,
+        "shift_summaries": shift_summaries,
+    }
 
 
 

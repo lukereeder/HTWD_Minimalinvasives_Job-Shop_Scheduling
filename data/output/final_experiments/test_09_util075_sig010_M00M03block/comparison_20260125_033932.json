@@ -1,0 +1,599 @@
+{
+  "timestamp": "20260125_033932",
+  "parameters": {
+    "util": 0.75,
+    "sigma": 0.1,
+    "time_limit": 1800,
+    "bound_no_improvement_time": 600,
+    "bound_warmup_time": 60,
+    "deviation_window_minutes": 480,
+    "deviation_bucket_minutes": 60,
+    "deviation_max_factor": null,
+    "machine_blockades": [
+      {
+        "machine": "M00",
+        "start": 1500,
+        "end": 1560
+      },
+      {
+        "machine": "M03",
+        "start": 2000,
+        "end": 2100
+      }
+    ],
+    "shift_length": 1440,
+    "total_shift_number": 22
+  },
+  "experiments": {
+    "standard_deviation": {
+      "experiment_id": 28,
+      "result": {
+        "experiment_id": 28,
+        "use_time_weighted_deviation": false,
+        "machine_blockades": [
+          {
+            "machine": "M00",
+            "start": 1500,
+            "end": 1560
+          },
+          {
+            "machine": "M03",
+            "start": 2000,
+            "end": 2100
+          }
+        ],
+        "shift_summaries": [
+          {
+            "shift": 1,
+            "status": "OPTIMAL",
+            "objective_value": 0.0,
+            "best_objective_bound": 0.0,
+            "number_of_branches": 21,
+            "wall_time": 0.01,
+            "tardiness_cost": 0,
+            "earliness_cost": 0,
+            "deviation_cost": 0,
+            "time_weighted_deviation_cost": 0
+          },
+          {
+            "shift": 2,
+            "status": "OPTIMAL",
+            "objective_value": 105.0,
+            "best_objective_bound": 105.0,
+            "number_of_branches": 43,
+            "wall_time": 0.12,
+            "tardiness_cost": 102,
+            "earliness_cost": 0,
+            "deviation_cost": 3,
+            "time_weighted_deviation_cost": 0
+          },
+          {
+            "shift": 3,
+            "status": "OPTIMAL",
+            "objective_value": 5788.0,
+            "best_objective_bound": 5777.0,
+            "number_of_branches": 88,
+            "wall_time": 36.07,
+            "tardiness_cost": 169,
+            "earliness_cost": 0,
+            "deviation_cost": 5619,
+            "time_weighted_deviation_cost": 0
+          },
+          {
+            "shift": 4,
+            "status": "FEASIBLE",
+            "objective_value": 24559.0,
+            "best_objective_bound": 4431.0,
+            "number_of_branches": 337,
+            "wall_time": 910.69,
+            "tardiness_cost": 2968,
+            "earliness_cost": 0,
+            "deviation_cost": 21591,
+            "time_weighted_deviation_cost": 0
+          },
+          {
+            "shift": 5,
+            "status": "FEASIBLE",
+            "objective_value": 4605.0,
+            "best_objective_bound": 3864.0,
+            "number_of_branches": 260,
+            "wall_time": 965.17,
+            "tardiness_cost": 2151,
+            "earliness_cost": 0,
+            "deviation_cost": 2454,
+            "time_weighted_deviation_cost": 0
+          },
+          {
+            "shift": 6,
+            "status": "OPTIMAL",
+            "objective_value": 2761.0,
+            "best_objective_bound": 2761.0,
+            "number_of_branches": 0,
+            "wall_time": 0.49,
+            "tardiness_cost": 16,
+            "earliness_cost": 0,
+            "deviation_cost": 2745,
+            "time_weighted_deviation_cost": 0
+          },
+          {
+            "shift": 7,
+            "status": "OPTIMAL",
+            "objective_value": 156.0,
+            "best_objective_bound": 156.0,
+            "number_of_branches": 212,
+            "wall_time": 0.03,
+            "tardiness_cost": 0,
+            "earliness_cost": 0,
+            "deviation_cost": 156,
+            "time_weighted_deviation_cost": 0
+          },
+          {
+            "shift": 8,
+            "status": "OPTIMAL",
+            "objective_value": 2189.0,
+            "best_objective_bound": 2189.0,
+            "number_of_branches": 303,
+            "wall_time": 19.45,
+            "tardiness_cost": 20,
+            "earliness_cost": 0,
+            "deviation_cost": 2169,
+            "time_weighted_deviation_cost": 0
+          },
+          {
+            "shift": 9,
+            "status": "FEASIBLE",
+            "objective_value": 11652.0,
+            "best_objective_bound": 9246.0,
+            "number_of_branches": 37,
+            "wall_time": 1352.65,
+            "tardiness_cost": 1119,
+            "earliness_cost": 0,
+            "deviation_cost": 10533,
+            "time_weighted_deviation_cost": 0
+          },
+          {
+            "shift": 10,
+            "status": "OPTIMAL",
+            "objective_value": 891.0,
+            "best_objective_bound": 891.0,
+            "number_of_branches": 5,
+            "wall_time": 0.08,
+            "tardiness_cost": 0,
+            "earliness_cost": 0,
+            "deviation_cost": 891,
+            "time_weighted_deviation_cost": 0
+          },
+          {
+            "shift": 11,
+            "status": "OPTIMAL",
+            "objective_value": 2442.0,
+            "best_objective_bound": 2442.0,
+            "number_of_branches": 189,
+            "wall_time": 0.1,
+            "tardiness_cost": 0,
+            "earliness_cost": 0,
+            "deviation_cost": 2442,
+            "time_weighted_deviation_cost": 0
+          },
+          {
+            "shift": 12,
+            "status": "OPTIMAL",
+            "objective_value": 1650.0,
+            "best_objective_bound": 1650.0,
+            "number_of_branches": 96,
+            "wall_time": 0.09,
+            "tardiness_cost": 0,
+            "earliness_cost": 0,
+            "deviation_cost": 1650,
+            "time_weighted_deviation_cost": 0
+          },
+          {
+            "shift": 13,
+            "status": "OPTIMAL",
+            "objective_value": 762.0,
+            "best_objective_bound": 762.0,
+            "number_of_branches": 143,
+            "wall_time": 0.15,
+            "tardiness_cost": 0,
+            "earliness_cost": 0,
+            "deviation_cost": 762,
+            "time_weighted_deviation_cost": 0
+          },
+          {
+            "shift": 14,
+            "status": "OPTIMAL",
+            "objective_value": 411.0,
+            "best_objective_bound": 411.0,
+            "number_of_branches": 153,
+            "wall_time": 0.05,
+            "tardiness_cost": 0,
+            "earliness_cost": 0,
+            "deviation_cost": 411,
+            "time_weighted_deviation_cost": 0
+          },
+          {
+            "shift": 15,
+            "status": "OPTIMAL",
+            "objective_value": 8734.0,
+            "best_objective_bound": 8734.0,
+            "number_of_branches": 198,
+            "wall_time": 7.0,
+            "tardiness_cost": 460,
+            "earliness_cost": 0,
+            "deviation_cost": 8274,
+            "time_weighted_deviation_cost": 0
+          },
+          {
+            "shift": 16,
+            "status": "OPTIMAL",
+            "objective_value": 6641.0,
+            "best_objective_bound": 6641.0,
+            "number_of_branches": 176,
+            "wall_time": 6.95,
+            "tardiness_cost": 404,
+            "earliness_cost": 0,
+            "deviation_cost": 6237,
+            "time_weighted_deviation_cost": 0
+          },
+          {
+            "shift": 17,
+            "status": "OPTIMAL",
+            "objective_value": 6.0,
+            "best_objective_bound": 6.0,
+            "number_of_branches": 133,
+            "wall_time": 0.02,
+            "tardiness_cost": 0,
+            "earliness_cost": 0,
+            "deviation_cost": 6,
+            "time_weighted_deviation_cost": 0
+          },
+          {
+            "shift": 18,
+            "status": "OPTIMAL",
+            "objective_value": 1905.0,
+            "best_objective_bound": 1905.0,
+            "number_of_branches": 137,
+            "wall_time": 0.11,
+            "tardiness_cost": 0,
+            "earliness_cost": 0,
+            "deviation_cost": 1905,
+            "time_weighted_deviation_cost": 0
+          },
+          {
+            "shift": 19,
+            "status": "OPTIMAL",
+            "objective_value": 594.0,
+            "best_objective_bound": 594.0,
+            "number_of_branches": 71,
+            "wall_time": 0.02,
+            "tardiness_cost": 0,
+            "earliness_cost": 0,
+            "deviation_cost": 594,
+            "time_weighted_deviation_cost": 0
+          },
+          {
+            "shift": 20,
+            "status": "OPTIMAL",
+            "objective_value": 96.0,
+            "best_objective_bound": 96.0,
+            "number_of_branches": 66,
+            "wall_time": 0.02,
+            "tardiness_cost": 0,
+            "earliness_cost": 0,
+            "deviation_cost": 96,
+            "time_weighted_deviation_cost": 0
+          },
+          {
+            "shift": 21,
+            "status": "OPTIMAL",
+            "objective_value": 1098.0,
+            "best_objective_bound": 1098.0,
+            "number_of_branches": 69,
+            "wall_time": 0.05,
+            "tardiness_cost": 0,
+            "earliness_cost": 0,
+            "deviation_cost": 1098,
+            "time_weighted_deviation_cost": 0
+          },
+          {
+            "shift": 22,
+            "status": "OPTIMAL",
+            "objective_value": 498.0,
+            "best_objective_bound": 498.0,
+            "number_of_branches": 119,
+            "wall_time": 0.03,
+            "tardiness_cost": 0,
+            "earliness_cost": 0,
+            "deviation_cost": 498,
+            "time_weighted_deviation_cost": 0
+          }
+        ]
+      }
+    },
+    "time_weighted_deviation": {
+      "experiment_id": 29,
+      "result": {
+        "experiment_id": 29,
+        "use_time_weighted_deviation": true,
+        "machine_blockades": [
+          {
+            "machine": "M00",
+            "start": 1500,
+            "end": 1560
+          },
+          {
+            "machine": "M03",
+            "start": 2000,
+            "end": 2100
+          }
+        ],
+        "shift_summaries": [
+          {
+            "shift": 1,
+            "status": "OPTIMAL",
+            "objective_value": 0.0,
+            "best_objective_bound": 0.0,
+            "number_of_branches": 53,
+            "wall_time": 0.02,
+            "tardiness_cost": 0,
+            "earliness_cost": 0,
+            "deviation_cost": 0,
+            "time_weighted_deviation_cost": 0
+          },
+          {
+            "shift": 2,
+            "status": "OPTIMAL",
+            "objective_value": 106.0,
+            "best_objective_bound": 106.0,
+            "number_of_branches": 142,
+            "wall_time": 0.67,
+            "tardiness_cost": 103,
+            "earliness_cost": 0,
+            "deviation_cost": 0,
+            "time_weighted_deviation_cost": 3
+          },
+          {
+            "shift": 3,
+            "status": "OPTIMAL",
+            "objective_value": 35911.0,
+            "best_objective_bound": 35846.0,
+            "number_of_branches": 194,
+            "wall_time": 11.17,
+            "tardiness_cost": 121,
+            "earliness_cost": 0,
+            "deviation_cost": 0,
+            "time_weighted_deviation_cost": 35790
+          },
+          {
+            "shift": 4,
+            "status": "OPTIMAL",
+            "objective_value": 37230.0,
+            "best_objective_bound": 37230.0,
+            "number_of_branches": 337,
+            "wall_time": 481.61,
+            "tardiness_cost": 822,
+            "earliness_cost": 0,
+            "deviation_cost": 0,
+            "time_weighted_deviation_cost": 36408
+          },
+          {
+            "shift": 5,
+            "status": "OPTIMAL",
+            "objective_value": 19787.0,
+            "best_objective_bound": 19787.0,
+            "number_of_branches": 103,
+            "wall_time": 802.32,
+            "tardiness_cost": 674,
+            "earliness_cost": 0,
+            "deviation_cost": 0,
+            "time_weighted_deviation_cost": 19113
+          },
+          {
+            "shift": 6,
+            "status": "OPTIMAL",
+            "objective_value": 25518.0,
+            "best_objective_bound": 25500.0,
+            "number_of_branches": 77,
+            "wall_time": 0.95,
+            "tardiness_cost": 48,
+            "earliness_cost": 0,
+            "deviation_cost": 0,
+            "time_weighted_deviation_cost": 25470
+          },
+          {
+            "shift": 7,
+            "status": "OPTIMAL",
+            "objective_value": 0.0,
+            "best_objective_bound": 0.0,
+            "number_of_branches": 212,
+            "wall_time": 0.03,
+            "tardiness_cost": 0,
+            "earliness_cost": 0,
+            "deviation_cost": 0,
+            "time_weighted_deviation_cost": 0
+          },
+          {
+            "shift": 8,
+            "status": "OPTIMAL",
+            "objective_value": 12182.0,
+            "best_objective_bound": 12182.0,
+            "number_of_branches": 220,
+            "wall_time": 22.43,
+            "tardiness_cost": 20,
+            "earliness_cost": 0,
+            "deviation_cost": 0,
+            "time_weighted_deviation_cost": 12162
+          },
+          {
+            "shift": 9,
+            "status": "OPTIMAL",
+            "objective_value": 44538.0,
+            "best_objective_bound": 44538.0,
+            "number_of_branches": 91,
+            "wall_time": 26.25,
+            "tardiness_cost": 363,
+            "earliness_cost": 0,
+            "deviation_cost": 0,
+            "time_weighted_deviation_cost": 44175
+          },
+          {
+            "shift": 10,
+            "status": "OPTIMAL",
+            "objective_value": 5268.0,
+            "best_objective_bound": 5268.0,
+            "number_of_branches": 120,
+            "wall_time": 0.29,
+            "tardiness_cost": 0,
+            "earliness_cost": 0,
+            "deviation_cost": 0,
+            "time_weighted_deviation_cost": 5268
+          },
+          {
+            "shift": 11,
+            "status": "OPTIMAL",
+            "objective_value": 34122.0,
+            "best_objective_bound": 34122.0,
+            "number_of_branches": 205,
+            "wall_time": 2.95,
+            "tardiness_cost": 18,
+            "earliness_cost": 0,
+            "deviation_cost": 0,
+            "time_weighted_deviation_cost": 34104
+          },
+          {
+            "shift": 12,
+            "status": "OPTIMAL",
+            "objective_value": 22734.0,
+            "best_objective_bound": 22734.0,
+            "number_of_branches": 182,
+            "wall_time": 0.11,
+            "tardiness_cost": 0,
+            "earliness_cost": 0,
+            "deviation_cost": 0,
+            "time_weighted_deviation_cost": 22734
+          },
+          {
+            "shift": 13,
+            "status": "OPTIMAL",
+            "objective_value": 32106.0,
+            "best_objective_bound": 32046.0,
+            "number_of_branches": 115,
+            "wall_time": 0.16,
+            "tardiness_cost": 0,
+            "earliness_cost": 0,
+            "deviation_cost": 0,
+            "time_weighted_deviation_cost": 32106
+          },
+          {
+            "shift": 14,
+            "status": "OPTIMAL",
+            "objective_value": 22537.0,
+            "best_objective_bound": 22506.0,
+            "number_of_branches": 187,
+            "wall_time": 0.16,
+            "tardiness_cost": 76,
+            "earliness_cost": 0,
+            "deviation_cost": 0,
+            "time_weighted_deviation_cost": 22461
+          },
+          {
+            "shift": 15,
+            "status": "OPTIMAL",
+            "objective_value": 15425.0,
+            "best_objective_bound": 15425.0,
+            "number_of_branches": 109,
+            "wall_time": 1.03,
+            "tardiness_cost": 86,
+            "earliness_cost": 0,
+            "deviation_cost": 0,
+            "time_weighted_deviation_cost": 15339
+          },
+          {
+            "shift": 16,
+            "status": "OPTIMAL",
+            "objective_value": 72528.0,
+            "best_objective_bound": 72528.0,
+            "number_of_branches": 162,
+            "wall_time": 10.93,
+            "tardiness_cost": 420,
+            "earliness_cost": 0,
+            "deviation_cost": 0,
+            "time_weighted_deviation_cost": 72108
+          },
+          {
+            "shift": 17,
+            "status": "OPTIMAL",
+            "objective_value": 0.0,
+            "best_objective_bound": 0.0,
+            "number_of_branches": 117,
+            "wall_time": 0.02,
+            "tardiness_cost": 0,
+            "earliness_cost": 0,
+            "deviation_cost": 0,
+            "time_weighted_deviation_cost": 0
+          },
+          {
+            "shift": 18,
+            "status": "OPTIMAL",
+            "objective_value": 12444.0,
+            "best_objective_bound": 12444.0,
+            "number_of_branches": 194,
+            "wall_time": 0.05,
+            "tardiness_cost": 0,
+            "earliness_cost": 0,
+            "deviation_cost": 0,
+            "time_weighted_deviation_cost": 12444
+          },
+          {
+            "shift": 19,
+            "status": "OPTIMAL",
+            "objective_value": 4230.0,
+            "best_objective_bound": 4230.0,
+            "number_of_branches": 73,
+            "wall_time": 0.02,
+            "tardiness_cost": 0,
+            "earliness_cost": 0,
+            "deviation_cost": 0,
+            "time_weighted_deviation_cost": 4230
+          },
+          {
+            "shift": 20,
+            "status": "OPTIMAL",
+            "objective_value": 1152.0,
+            "best_objective_bound": 1152.0,
+            "number_of_branches": 134,
+            "wall_time": 0.02,
+            "tardiness_cost": 0,
+            "earliness_cost": 0,
+            "deviation_cost": 0,
+            "time_weighted_deviation_cost": 1152
+          },
+          {
+            "shift": 21,
+            "status": "OPTIMAL",
+            "objective_value": 8427.0,
+            "best_objective_bound": 8427.0,
+            "number_of_branches": 90,
+            "wall_time": 0.04,
+            "tardiness_cost": 0,
+            "earliness_cost": 0,
+            "deviation_cost": 0,
+            "time_weighted_deviation_cost": 8427
+          },
+          {
+            "shift": 22,
+            "status": "OPTIMAL",
+            "objective_value": 3362.0,
+            "best_objective_bound": 3362.0,
+            "number_of_branches": 123,
+            "wall_time": 0.09,
+            "tardiness_cost": 2,
+            "earliness_cost": 0,
+            "deviation_cost": 0,
+            "time_weighted_deviation_cost": 3360
+          }
+        ]
+      }
+    }
+  }
+}
