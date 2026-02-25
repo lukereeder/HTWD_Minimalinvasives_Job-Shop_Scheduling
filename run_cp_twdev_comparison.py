@@ -200,7 +200,7 @@ def main() -> None:
         "result": result_std,
     }
 
-    print(f"✓ Standard Deviation experiment completed (ID: {exp_id_std})")
+    print(f"[OK] Standard Deviation experiment completed (ID: {exp_id_std})")
 
     # ========================================================================
     # 2. Time-Weighted-Deviation Experiment
@@ -242,7 +242,7 @@ def main() -> None:
         "result": result_twdev,
     }
 
-    print(f"✓ Time-Weighted Deviation experiment completed (ID: {exp_id_twdev})")
+    print(f"[OK] Time-Weighted Deviation experiment completed (ID: {exp_id_twdev})")
 
     # ========================================================================
     # 3. Ergebnisse speichern

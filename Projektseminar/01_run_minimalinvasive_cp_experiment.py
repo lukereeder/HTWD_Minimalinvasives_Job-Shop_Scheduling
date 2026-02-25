@@ -44,7 +44,7 @@ if __name__ == "__main__":
     args, unknown = parser.parse_known_args()
 
     if unknown:
-        print(f"⚠️ Ignoring unknown arguments: {unknown}")
+        print(f"[WARN] Ignoring unknown arguments: {unknown}")
 
     util = args.util
     lateness_ratio = args.lateness_ratio

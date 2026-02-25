@@ -82,17 +82,17 @@ def test_with_blockade():
             use_time_weighted_deviation=False,
             machine_blockades=machine_blockades,
         )
-        print(f"\n✓ Test erfolgreich (Experiment ID: {exp_id})")
+        print(f"\n[OK] Test erfolgreich (Experiment ID: {exp_id})")
         print(f"  Shifts verarbeitet: {len(result.get('shift_summaries', []))}")
         print(f"  Blockaden: {result.get('machine_blockades')}")
         return True
     except Exception as e:
         # E-Mail-Fehler ignorieren (nur SMTP-Authentifizierung)
         if "Username and Password not accepted" in str(e) or "BadCredentials" in str(e):
-            print(f"\n✓ Test erfolgreich (Experiment ID: {exp_id})")
+            print(f"\n[OK] Test erfolgreich (Experiment ID: {exp_id})")
             print(f"  (E-Mail-Benachrichtigung übersprungen)")
             return True
-        print(f"\n✗ Test fehlgeschlagen: {e}")
+        print(f"\n[FAIL] Test fehlgeschlagen: {e}")
         import traceback
         traceback.print_exc()
         return False
@@ -108,14 +108,14 @@ def main():
     print("\n" + "="*80)
     print("TESTERGEBNIS")
     print("="*80)
-    print(f"Maschinenblockade-Test: {'✓ BESTANDEN' if test_passed else '✗ FEHLGESCHLAGEN'}")
+    print(f"Maschinenblockade-Test: {'[OK] BESTANDEN' if test_passed else '[FAIL] FEHLGESCHLAGEN'}")
     print("="*80 + "\n")
     
     if test_passed:
-        print("\n✓ TEST BESTANDEN - Maschinenblockade funktioniert!")
+        print("\n[OK] TEST BESTANDEN - Maschinenblockade funktioniert!")
         return 0
     else:
-        print("\n✗ TEST FEHLGESCHLAGEN - Bitte Logs prüfen")
+        print("\n[FAIL] TEST FEHLGESCHLAGEN - Bitte Logs prüfen")
         return 1
 
 

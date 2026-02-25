@@ -441,25 +441,25 @@ class DataFramePlotGenerator:
         import numpy as np
         import pandas as pd
 
-        # 🔹 1) Optionaler Filter
+        # 1) Optionaler Filter
         if routing_filter is not None:
             df_times = df_times[df_times[routing_column].isin(routing_filter)]
 
         routings = df_times[routing_column].unique()
         n_routings = len(routings)
 
-        # 🔹 2) Figure mit gemeinsamer Y-Achse
+        # 2) Figure mit gemeinsamer Y-Achse
         fig, axes = plt.subplots(1, n_routings, figsize=(5 * n_routings, 4), sharey=True)
         if n_routings == 1:
             axes = [axes]
 
-        # 🔹 3) Globale Wertebereiche bestimmen
+        # 3) Globale Wertebereiche bestimmen
         elapsed_times_all = df_times[simulated_end_column] - df_times[earliest_start_column]
         global_y_max = y_max or (0.002 * (n_routings / 2))
         if x_max is None:
             x_max = float(elapsed_times_all.max() * 1.1)
 
-        # 🔹 4) Subplots erzeugen
+        # 4) Subplots erzeugen
         for idx, routing in enumerate(routings):
             ax = axes[idx]
             dfr = df_times[df_times[routing_column] == routing]
@@ -483,7 +483,7 @@ class DataFramePlotGenerator:
 
             ax.set_title(f"Routing {routing}")
 
-            # ✅ Nur beim ersten Subplot Y-Achse mit Skala
+            # Nur beim ersten Subplot Y-Achse mit Skala
             if idx == 0:
                 ax.set_ylabel("Density [1/min]")
                 ax.tick_params(axis="y", left=True, labelleft=True)
@@ -493,14 +493,14 @@ class DataFramePlotGenerator:
                 ax.tick_params(axis="y", left=False, labelleft=False)
                 ax.spines["left"].set_visible(True)
 
-            # ✅ Nur beim letzten Subplot X-Label & Legende
+            # Nur beim letzten Subplot X-Label & Legende
             if idx == n_routings - 1:
                 ax.set_xlabel("Timespan from earliest start [min]", ha="right", x=1.0)
                 ax.legend(loc="upper left", bbox_to_anchor=(1.0, 1.0), frameon=False)
             else:
                 ax.set_xlabel("")
 
-            # ✅ Einheitliche Achsen
+            # Einheitliche Achsen
             ax.set_xlim(0, x_max)
             ax.set_ylim(0, global_y_max)
 

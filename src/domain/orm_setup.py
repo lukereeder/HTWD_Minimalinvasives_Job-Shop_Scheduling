@@ -5,7 +5,7 @@ from sqlalchemy.orm import sessionmaker, registry
 
 from config.project_config import PROJECT_ROOT, get_data_path
 
-# 🔧 Build path relative to this file
+# Build path relative to this file
 
 DB_PATH = os.path.join(PROJECT_ROOT, "experiments.db")
 # DB_PATH = os.path.join(PROJECT_ROOT, "experiments_gt.db")
@@ -27,13 +27,13 @@ def create_tables():
 
 def reset_tables():
     confirmation = input(
-        "⚠️ Are you sure you want to reset ALL tables? With 'yes' ALL DATA will be lost. [yes/No]\n"
+        "[WARN] Are you sure you want to reset ALL tables? With 'yes' ALL DATA will be lost. [yes/No]\n"
     ).strip().lower().replace("'", "").replace('"', '')
     if confirmation != "yes" :
-        print("❌ Operation cancelled. Nothing has been changed.")
+        print("[FAIL] Operation cancelled. Nothing has been changed.")
         return
 
     mapper_registry.metadata.drop_all(my_engine)
     mapper_registry.metadata.create_all(my_engine)
-    print("✅ All tables have been reset.")
+    print("[OK] All tables have been reset.")
 

@@ -70,16 +70,16 @@ def test_standard_deviation():
             bound_warmup_time=30,
             use_time_weighted_deviation=False,
         )
-        print(f"✓ Standard-Deviation Test erfolgreich (Experiment ID: {exp_id})")
+        print(f"[OK] Standard-Deviation Test erfolgreich (Experiment ID: {exp_id})")
         print(f"  Shifts verarbeitet: {len(result.get('shift_summaries', []))}")
         return True
     except Exception as e:
         # E-Mail-Fehler ignorieren (nur SMTP-Authentifizierung)
         if "Username and Password not accepted" in str(e) or "BadCredentials" in str(e):
-            print(f"✓ Standard-Deviation Test erfolgreich (Experiment ID: {exp_id})")
+            print(f"[OK] Standard-Deviation Test erfolgreich (Experiment ID: {exp_id})")
             print(f"  (E-Mail-Benachrichtigung übersprungen)")
             return True
-        print(f"✗ Standard-Deviation Test fehlgeschlagen: {e}")
+        print(f"[FAIL] Standard-Deviation Test fehlgeschlagen: {e}")
         return False
 
 
@@ -137,16 +137,16 @@ def test_time_weighted_deviation():
             deviation_bucket_minutes=60,
             deviation_max_factor=8,
         )
-        print(f"✓ Time-Weighted-Deviation Test erfolgreich (Experiment ID: {exp_id})")
+        print(f"[OK] Time-Weighted-Deviation Test erfolgreich (Experiment ID: {exp_id})")
         print(f"  Shifts verarbeitet: {len(result.get('shift_summaries', []))}")
         return True
     except Exception as e:
         # E-Mail-Fehler ignorieren (nur SMTP-Authentifizierung)
         if "Username and Password not accepted" in str(e) or "BadCredentials" in str(e):
-            print(f"✓ Time-Weighted-Deviation Test erfolgreich (Experiment ID: {exp_id})")
+            print(f"[OK] Time-Weighted-Deviation Test erfolgreich (Experiment ID: {exp_id})")
             print(f"  (E-Mail-Benachrichtigung übersprungen)")
             return True
-        print(f"✗ Time-Weighted-Deviation Test fehlgeschlagen: {e}")
+        print(f"[FAIL] Time-Weighted-Deviation Test fehlgeschlagen: {e}")
         return False
 
 
@@ -161,15 +161,15 @@ def main():
     print("\n" + "="*80)
     print("TESTERGEBNISSE")
     print("="*80)
-    print(f"Test 1 (Standard-Deviation): {'✓ BESTANDEN' if test1_passed else '✗ FEHLGESCHLAGEN'}")
-    print(f"Test 2 (Time-Weighted-Deviation): {'✓ BESTANDEN' if test2_passed else '✗ FEHLGESCHLAGEN'}")
+    print(f"Test 1 (Standard-Deviation): {'[OK] BESTANDEN' if test1_passed else '[FAIL] FEHLGESCHLAGEN'}")
+    print(f"Test 2 (Time-Weighted-Deviation): {'[OK] BESTANDEN' if test2_passed else '[FAIL] FEHLGESCHLAGEN'}")
     print("="*80)
     
     if test1_passed and test2_passed:
-        print("\n✓ ALLE TESTS BESTANDEN - Integration erfolgreich!")
+        print("\n[OK] ALLE TESTS BESTANDEN - Integration erfolgreich!")
         return 0
     else:
-        print("\n✗ EINIGE TESTS FEHLGESCHLAGEN - Bitte Logs prüfen")
+        print("\n[FAIL] EINIGE TESTS FEHLGESCHLAGEN - Bitte Logs prüfen")
         return 1
 
 

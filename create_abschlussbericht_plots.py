@@ -70,12 +70,12 @@ def parse_log_files():
     
     for log_path, exp_id, exp_type in comparison_logs:
         if not Path(log_path).exists():
-            print(f"⚠️  Log nicht gefunden: {log_path}")
+            print(f"[WARN]  Log nicht gefunden: {log_path}")
             continue
         
         data_list = parse_comparison_log(log_path, exp_id, exp_type)
         log_data.extend(data_list)
-        print(f"✅ {len(data_list)} Shifts aus {log_path} geladen")
+        print(f"[OK] {len(data_list)} Shifts aus {log_path} geladen")
     
     return pd.DataFrame(log_data)
 
@@ -166,7 +166,7 @@ def parse_comparison_log(log_path, exp_id, exp_type):
         return data_list
     
     except Exception as e:
-        print(f"❌ Fehler beim Parsen von {log_path}: {e}")
+        print(f"[FAIL] Fehler beim Parsen von {log_path}: {e}")
         return []
 
 
@@ -227,13 +227,13 @@ def parse_single_log(log_path, exp_id, shift_num, exp_type):
         return data
     
     except Exception as e:
-        print(f"⚠️  Fehler beim Parsen von {log_path}: {e}")
+        print(f"[WARN]  Fehler beim Parsen von {log_path}: {e}")
         return None
 
 
 def create_solver_status_comparison(df):
     """Abb. 8.1: Balkendiagramm - Solver-Status-Vergleich"""
-    print("\n📊 Erstelle Abb. 8.1: Solver-Status-Vergleich...")
+    print("\n-- Erstelle Abb. 8.1: Solver-Status-Vergleich...")
     
     # Zähle Status pro Experiment
     status_counts = df.groupby(['experiment_type', 'status']).size().unstack(fill_value=0)
@@ -273,7 +273,7 @@ def create_solver_status_comparison(df):
     plt.tight_layout()
     output_path = OUTPUT_DIR / 'abb_8_1_solver_status.png'
     plt.savefig(output_path, dpi=300, bbox_inches='tight')
-    print(f"✅ Gespeichert: {output_path}")
+    print(f"[OK] Gespeichert: {output_path}")
     plt.close()
     
     # Statistik ausgeben
@@ -288,13 +288,13 @@ def create_solver_status_comparison(df):
 
 def create_tardiness_deviation_scatter(df):
     """Abb. 8.2: Scatter-Plot - Tardiness vs. Deviation"""
-    print("\n📊 Erstelle Abb. 8.2: Tardiness vs. Deviation...")
+    print("\n-- Erstelle Abb. 8.2: Tardiness vs. Deviation...")
     
     # Filtere Shifts mit Daten
     plot_df = df[df['tardiness_cost'].notna() & df['deviation_cost'].notna()].copy()
     
     if len(plot_df) == 0:
-        print("⚠️  Keine Daten für Tardiness/Deviation gefunden!")
+        print("[WARN]  Keine Daten für Tardiness/Deviation gefunden!")
         return
     
     fig, ax = plt.subplots(figsize=(12, 7))
@@ -327,7 +327,7 @@ def create_tardiness_deviation_scatter(df):
     plt.tight_layout()
     output_path = OUTPUT_DIR / 'abb_8_2_tardiness_deviation.png'
     plt.savefig(output_path, dpi=300, bbox_inches='tight')
-    print(f"✅ Gespeichert: {output_path}")
+    print(f"[OK] Gespeichert: {output_path}")
     plt.close()
     
     # Statistik
@@ -342,13 +342,13 @@ def create_tardiness_deviation_scatter(df):
 
 def create_solving_time_boxplot(df):
     """Abb. 8.3: Box-Plot - Lösungszeiten pro Shift"""
-    print("\n📊 Erstelle Abb. 8.3: Lösungszeiten Box-Plot...")
+    print("\n-- Erstelle Abb. 8.3: Lösungszeiten Box-Plot...")
     
     # Filtere Shifts mit Zeitdaten
     plot_df = df[df['wall_time'].notna()].copy()
     
     if len(plot_df) == 0:
-        print("⚠️  Keine Zeitdaten gefunden!")
+        print("[WARN]  Keine Zeitdaten gefunden!")
         return
     
     fig, ax = plt.subplots(figsize=(12, 6))
@@ -393,7 +393,7 @@ def create_solving_time_boxplot(df):
     plt.tight_layout()
     output_path = OUTPUT_DIR / 'abb_8_3_solving_times.png'
     plt.savefig(output_path, dpi=300, bbox_inches='tight')
-    print(f"✅ Gespeichert: {output_path}")
+    print(f"[OK] Gespeichert: {output_path}")
     plt.close()
     
     # Statistik
@@ -413,21 +413,21 @@ def main():
     
     # Prüfe Datenbank
     if not Path(DB_PATH).exists():
-        print(f"❌ Datenbank nicht gefunden: {DB_PATH}")
+        print(f"[FAIL] Datenbank nicht gefunden: {DB_PATH}")
         return 1
     
-    print(f"✅ Datenbank gefunden: {DB_PATH}")
+    print(f"[OK] Datenbank gefunden: {DB_PATH}")
     
     # Lade Daten
-    print("\n📂 Lade Daten aus Log-Dateien...")
+    print("\n-- Lade Daten aus Log-Dateien...")
     df = parse_log_files()
     
     if len(df) == 0:
-        print("❌ Keine Log-Daten gefunden!")
+        print("[FAIL] Keine Log-Daten gefunden!")
         print("   Bitte prüfe: data/logs/Experiment_034/ und data/logs/Experiment_035/")
         return 1
     
-    print(f"✅ {len(df)} Shifts geladen")
+    print(f"[OK] {len(df)} Shifts geladen")
     print(f"   Experiment 34 (std-dev): {len(df[df['experiment_id']==34])} Shifts")
     print(f"   Experiment 35 (twdev):   {len(df[df['experiment_id']==35])} Shifts")
     
@@ -437,7 +437,7 @@ def main():
     create_solving_time_boxplot(df)
     
     print("\n" + "="*80)
-    print("✅ ALLE PLOTS ERFOLGREICH ERSTELLT")
+    print("[OK] ALLE PLOTS ERFOLGREICH ERSTELLT")
     print("="*80)
     print(f"\nPlots gespeichert in: {OUTPUT_DIR}/")
     print("  - abb_8_1_solver_status.png")

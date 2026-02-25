@@ -354,7 +354,7 @@ def plot_experiment_boxrow(
     xlabel_at_col: int = 0,
     ratio_label_on: bool = True,
     ymax: Optional[float] = None,
-    # 🆕: Boxbreite und Text-Verschiebung
+    # Boxbreite und Text-Verschiebung
     box_width: float = 0.4,
     median_text_dx: float = 0.25,
     x_lim_extra: float = 0.6,
@@ -412,7 +412,7 @@ def plot_experiment_boxrow(
         bp = ax.boxplot(
             data_arrays,
             positions=positions,
-            widths=box_width,             # 🆕 schlankere Boxen
+            widths=box_width,
             showfliers=flier_visible,
             patch_artist=False,
             boxprops=boxprops,
@@ -444,7 +444,7 @@ def plot_experiment_boxrow(
                 pad=11
             )
 
-        # 🆕 Median-Werte RECHTS neben der Box anzeigen
+        # Median-Werte rechts neben der Box
         if show_median_labels:
             for k, med_line in enumerate(bp["medians"]):
                 # x-Mitte des Medianstrichs
@@ -502,7 +502,7 @@ def plot_experiment_lines_compare(
     marker_edgecolor: str = "white",
     marker_edgewidth: float = 0.8,
     ratio_label_on: bool = True,
-    # ✅ Neu:
+    #
     ymax: Optional[float] = None,
     ymin: Optional[float] = None,
     legend_loc: Literal[
@@ -631,7 +631,7 @@ def plot_experiment_lines_compare(
     ax.set_xlabel(x_col_as, fontsize=fontsize)
     ax.set_ylabel(value_as, fontsize=fontsize)
 
-    # ✅ manuelles Y-Limit
+    # manuelles Y-Limit
     if ymin is not None or ymax is not None:
         ax.set_ylim(bottom=ymin, top=ymax)
 
@@ -663,8 +663,8 @@ def compute_experiment_summary_df(
     id_col: str = "Experiment_ID",
     axis_a: str = "Inner Tardiness Ratio",       # ehemals x_col
     axis_b: str = "Max Bottleneck Utilization",  # ehemals compare_col
-    axis_a_as: Optional[str] = None,             # ✅ neuer Anzeigename für Axis A
-    axis_b_as: Optional[str] = None,             # ✅ neuer Anzeigename für Axis B
+    axis_a_as: Optional[str] = None,
+    axis_b_as: Optional[str] = None,
     agg_method: Literal["mean", "median"] = "mean",
     show_quantile_band: bool = True,
     quantile_band: Tuple[float, float] = (0.25, 0.75),

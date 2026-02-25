@@ -21,7 +21,7 @@ def load_all_results() -> List[Dict]:
     all_results = []
     
     if not results_dir.exists():
-        print(f"❌ Verzeichnis nicht gefunden: {results_dir}")
+        print(f"[FAIL] Verzeichnis nicht gefunden: {results_dir}")
         return []
     
     for json_file in sorted(results_dir.glob("*/comparison_*.json")):
@@ -31,7 +31,7 @@ def load_all_results() -> List[Dict]:
                 data['_source_file'] = str(json_file)
                 all_results.append(data)
         except Exception as e:
-            print(f"⚠️  Fehler beim Laden von {json_file}: {e}")
+            print(f"[WARN] Fehler beim Laden von {json_file}: {e}")
     
     return all_results
 
@@ -138,7 +138,7 @@ def create_comparison_overview(df: pd.DataFrame, output_dir: Path) -> None:
     plt.tight_layout()
     output_file = output_dir / 'experiments_overview.png'
     plt.savefig(output_file, dpi=300, bbox_inches='tight')
-    print(f"✓ Übersicht gespeichert: {output_file}")
+    print(f"[OK] Uebersicht gespeichert: {output_file}")
     plt.close()
 
 
@@ -146,7 +146,7 @@ def export_to_csv(df: pd.DataFrame, output_dir: Path) -> None:
     """Exportiert Zusammenfassung als CSV"""
     output_file = output_dir / 'experiments_summary.csv'
     df.to_csv(output_file, index=False)
-    print(f"✓ CSV exportiert: {output_file}")
+    print(f"[OK] CSV exportiert: {output_file}")
 
 
 def main():
@@ -158,11 +158,11 @@ def main():
     results = load_all_results()
     
     if not results:
-        print("❌ Keine Ergebnisse gefunden!")
+        print("[FAIL] Keine Ergebnisse gefunden!")
         print("   Bitte zuerst Experimente durchführen: ./run_all_final_experiments.sh")
         return 1
     
-    print(f"✓ {len(results)} Experimente geladen")
+    print(f"[OK] {len(results)} Experimente geladen")
     
     # Extrahiere Metriken
     df = extract_metrics(results)
