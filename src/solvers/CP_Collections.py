@@ -25,12 +25,7 @@ class CostVarCollection(list):
 
 
 class WeightedCostVarCollection(list):
-    """
-    Collection for cost variables with individual integer weights per variable.
-
-    This is useful when the cost coefficient depends on metadata (e.g., "near-future"
-    rescheduling penalties where each operation gets a different deviation weight).
-    """
+    """Cost variables with individual integer weights (e.g. time-weighted deviation)."""
 
     def __init__(self):
         super().__init__()

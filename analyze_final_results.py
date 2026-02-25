@@ -187,11 +187,6 @@ def main():
     print(f"Ergebnisse in: {output_dir}")
     print("="*80 + "\n")
     
-    print("Nächste Schritte:")
-    print("1. Detaillierte Visualisierungen: python3 create_final_visualizations.py")
-    print("2. Datenbank-Analyse für Metriken (Makespan, Tardiness, etc.)")
-    print("3. Abschlussbericht schreiben basierend auf Erkenntnissen")
-    
     return 0
 
 

@@ -82,7 +82,6 @@ class Solver:
                 interval = self.model.NewIntervalVar(start, operation.duration, end, f"interval_{suffix}")
                 # interval = model.NewIntervalVar(start, operation.duration, start + operation.duration, f"interval_{suffix}")
 
-                # Store variables for later constraint/objective building
                 self.start_times.add(job_idx, op_idx, start)
                 self.end_times.add(job_idx, op_idx, end)
                 self.intervals.add(job_idx, op_idx, interval, operation.machine_name)
@@ -92,7 +91,6 @@ class Solver:
 
     # Rescheduling -------------------------------------------------------------------------------------------
     def _extract_previous_starts_for_deviation(self):
-        # Previous schedule: extract start times for deviation penalties
         if self.previous_schedule_jobs_collection is not None:
             for job in self.previous_schedule_jobs_collection.values():
                 for operation in job.operations:
@@ -102,7 +100,6 @@ class Solver:
                         self.original_operation_starts[(job_idx, op_idx)] = operation.start
 
     def _extract_delays_from_active_operations(self):
-        # Active operations: block machines and delay jobs
         if self.active_jobs_collection is not None:
             for job in self.active_jobs_collection.values():
                 for operation in job.operations:
@@ -947,13 +944,7 @@ class Solver:
 
 @contextlib.contextmanager
 def _redirect_cpp_logs(logfile_path: str = "cp_output.log"):
-    """
-    Context manager to temporarily redirect stdout/stderr,
-    e.g. to capture output from OR-Tools CP-SAT solver or other C++ logs.
-    After the block, original output streams are restored.
-    """
-
-    # Flush any current output to avoid mixing content
+    """Redirect stdout/stderr to logfile (captures C++ solver output)."""
     sys.stdout.flush()
     sys.stderr.flush()
 

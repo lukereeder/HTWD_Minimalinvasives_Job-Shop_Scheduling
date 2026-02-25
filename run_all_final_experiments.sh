@@ -178,10 +178,6 @@ echo "Ergebnisse in: $OUTPUT_BASE"
 echo "Log-Datei: $LOG_FILE"
 echo "============================================================================"
 echo ""
-echo "Nächste Schritte:"
-echo "1. Ergebnisse analysieren: python3 analyze_final_results.py"
-echo "2. Visualisierungen erstellen: python3 create_final_visualizations.py"
-echo "============================================================================"
 
 
 

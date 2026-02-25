@@ -154,9 +154,6 @@ def main():
     print("\n" + "="*80)
     print("TWDEV-INTEGRATION SCHNELLTEST")
     print("="*80)
-    print("Dieser Test überprüft, ob die twdev-Integration funktioniert.")
-    print("Es werden 2 Shifts mit beiden Methoden durchgeführt.")
-    print("="*80)
     
     test1_passed = test_standard_deviation()
     test2_passed = test_time_weighted_deviation()

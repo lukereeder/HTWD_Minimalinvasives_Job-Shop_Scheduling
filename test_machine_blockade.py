@@ -102,9 +102,6 @@ def main():
     print("\n" + "="*80)
     print("MASCHINENBLOCKADE-TEST")
     print("="*80)
-    print("Dieser Test überprüft, ob Maschinenblockaden korrekt funktionieren.")
-    print("Es werden 2 Shifts durchgeführt mit einer Blockade auf M00.")
-    print("="*80)
     
     test_passed = test_with_blockade()
     

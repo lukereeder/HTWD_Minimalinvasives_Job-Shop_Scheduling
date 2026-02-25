@@ -95,7 +95,6 @@ def main() -> None:
 
     args = parser.parse_args()
 
-    # Load config
     config_path = get_config_path("experiments_config.toml", as_string=False)
     with open(config_path, "rb") as f:
         cfg = pytoml.load(f)
@@ -127,7 +126,6 @@ def main() -> None:
                 'end': int(parts[2])
             })
 
-    # Output-Verzeichnis erstellen
     output_dir = Path(args.output_dir)
     output_dir.mkdir(parents=True, exist_ok=True)
 
@@ -281,9 +279,8 @@ def main() -> None:
             print(f"{shift_num:<8} {std_status:<20} {twdev_status:<20}")
     
     print("\n" + "="*80)
-    print("Weitere Analyse kann in der Datenbank durchgeführt werden:")
-    print(f"  - Experiment {exp_id_std}: Standard Deviation")
-    print(f"  - Experiment {exp_id_twdev}: Time-Weighted Deviation")
+    print(f"Experiment {exp_id_std}: Standard Deviation")
+    print(f"Experiment {exp_id_twdev}: Time-Weighted Deviation")
     print("="*80 + "\n")
 
 

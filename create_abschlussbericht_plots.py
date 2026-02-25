@@ -443,7 +443,6 @@ def main():
     print("  - abb_8_1_solver_status.png")
     print("  - abb_8_2_tardiness_deviation.png")
     print("  - abb_8_3_solving_times.png")
-    print("\nNächster Schritt: Plots in Abschlussbericht einbinden")
     print("="*80 + "\n")
     
     return 0

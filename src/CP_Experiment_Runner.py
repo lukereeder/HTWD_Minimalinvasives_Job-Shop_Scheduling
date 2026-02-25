@@ -84,11 +84,9 @@ def run_experiment(
         new_jobs_collection = jobs_collection.get_subset_by_earliest_start(earliest_start=shift_start)
         current_jobs_collection = new_jobs_collection + waiting_job_ops_collection
 
-        # Determine active blockades for this shift
         active_blockades = []
         if machine_blockades:
             for blockade in machine_blockades:
-                # Blockade is active if it overlaps with current shift
                 if blockade['start'] < shift_end and blockade['end'] > shift_start:
                     active_blockades.append(blockade)
                     logger.info(f"Active blockade in shift {shift_number}: {blockade['machine']} from {blockade['start']} to {blockade['end']}")
